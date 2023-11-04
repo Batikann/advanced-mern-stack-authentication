@@ -6,7 +6,7 @@ const activeLink = ({ isActive }) => (isActive ? 'text-indigo-500' : '')
 const Header = () => {
   return (
     <header className="bg-indigo-800 p-5">
-      <nav className="flex items-center justify-between mx-2">
+      <nav className="flex items-center justify-between max-w-7xl mx-auto">
         <div className="logo">
           <Link
             to="/"

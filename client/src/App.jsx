@@ -1,6 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home/Home'
 import Layout from './components/layout/Layout'
+import Login from './pages/auth/Login'
+import Register from './pages/auth/Register'
+import { ToastContainer } from 'react-toastify'
 
 function App() {
   return (
@@ -14,6 +17,8 @@ function App() {
             </Layout>
           }
         />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </BrowserRouter>
   )

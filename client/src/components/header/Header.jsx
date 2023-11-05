@@ -2,7 +2,7 @@ import { BiUserCircle } from 'react-icons/bi'
 import { SiAuthelia } from 'react-icons/si'
 import { Link, NavLink } from 'react-router-dom'
 
-const activeLink = ({ isActive }) => (isActive ? 'text-indigo-500' : '')
+const activeLink = ({ isActive }) => (isActive ? 'border-b border-b-white' : '')
 const Header = () => {
   return (
     <header className="bg-indigo-800 p-5">

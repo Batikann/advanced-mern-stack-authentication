@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import PageMenu from '../../components/pageMenu/PageMenu'
 
 const initialState = {
   name: 'Emir Batikan UÇAR',
@@ -17,6 +18,7 @@ const Profile = () => {
 
   return (
     <section className="flex justify-center flex-col  items-center">
+      <PageMenu />
       <div>
         <h2 className="text-3xl font-bold tracking-wider text-center my-5">
           Profile

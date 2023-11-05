@@ -22,7 +22,7 @@ const Login = () => {
         <p className="font-bold text-lg">or</p>
       </div>
       <div>
-        <form className="flex flex-col gap-3" onSubmit={loginUser}>
+        <form className="flex flex-col gap-3 mb-2" onSubmit={loginUser}>
           <input
             className="h-10 px-4 text-black outline-none border border-slate-900"
             type="text"
@@ -39,7 +39,7 @@ const Login = () => {
             Login
           </button>
         </form>
-        <Link to="/forgot" className="mt-2">
+        <Link to="/forgot" className="mt-2 hover:underline underline-offset-2">
           Forgot Password
         </Link>
       </div>

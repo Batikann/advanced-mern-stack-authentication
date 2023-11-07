@@ -9,4 +9,8 @@ const correctUserPassword = (loginUserPassword, databaseUserPassword) => {
   return bcrypt.compare(loginUserPassword, databaseUserPassword)
 }
 
-module.exports = { generateToken, correctUserPassword }
+const verifyToken = (token) => {
+  return jwt.verify(token, process.env.JWT_SECRET_KEY)
+}
+
+module.exports = { generateToken, correctUserPassword, verifyToken }

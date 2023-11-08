@@ -1,8 +1,15 @@
 const asyncHandler = require('express-async-handler')
 const User = require('../models/user.model')
-const { generateToken, correctUserPassword, verifyToken } = require('../utils')
+const {
+  generateToken,
+  correctUserPassword,
+  verifyToken,
+  hashToken,
+} = require('../utils')
 const parser = require('ua-parser-js')
 const sendEmail = require('../utils/sendEmail')
+const Token = require('../models/token.model')
+const crypto = require('crypto')
 
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body
@@ -60,6 +67,86 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(400)
     throw new Error('Invalid user data.')
   }
+})
+
+const sendVerificationEmail = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id)
+  if (!user) {
+    res.status(404)
+    throw new Error('User Not Found')
+  }
+
+  if (user.isVerified) {
+    res.status(500)
+    throw new Error('User Already Verified')
+  }
+
+  let token = Token.findOne({ userId: user._id })
+  if (token) {
+    await token.deleteOne()
+  }
+
+  const verificationToken = crypto.randomBytes(32).toString('hex') + user._id
+
+  const hashedToken = hashToken(verificationToken)
+
+  console.log(verificationToken)
+
+  await new Token({
+    userId: user._id,
+    vToken: hashedToken,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + 60 * (60 * 1000) /*1 hour */,
+  }).save()
+
+  const verificationURL = `${process.env.FRONTEND_URL}/verify/${verificationToken}`
+
+  //send Email
+  const subject = 'verify your Account - AUTHZ'
+  const send_to = user.email
+  const sent_from = process.env.EMAIL_USER
+  const reply_to = 'noreply@batik.com'
+  const template = 'email'
+  const name = user.name
+  const link = verificationURL
+
+  try {
+    await sendEmail(subject, send_to, sent_from, reply_to, template, name, link)
+    res.status(200).json({ message: 'Verification Email sent' })
+  } catch (error) {
+    res.status(500)
+    throw new Error('Email not sent, please try again!.')
+  }
+})
+
+const verifyUser = asyncHandler(async (req, res) => {
+  const { verificationToken } = req.params
+
+  const hashedToken = hashToken(verificationToken)
+
+  const userToken = await Token.findOne({
+    vToken: hashedToken,
+    expiresAt: { $gt: Date.now() },
+  })
+
+  if (!userToken) {
+    res.status(404)
+    throw new Error('Invalid or Expired Token')
+  }
+
+  //Find User
+  const user = await User.findById({ _id: userToken.userId })
+  if (user.isVerified) {
+    res.status(400)
+    throw new Error('User Already verified.')
+  }
+
+  //Now verify User
+  user.isVerified = true
+  await user.save()
+  res
+    .status(200)
+    .json({ message: `Account verified successfully welcome ${user.name}` })
 })
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -263,4 +350,6 @@ module.exports = {
   loginStatus,
   upgradeUser,
   sendAutomatedEmail,
+  sendVerificationEmail,
+  verifyUser,
 }

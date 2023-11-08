@@ -10,6 +10,8 @@ const {
   loginStatus,
   upgradeUser,
   sendAutomatedEmail,
+  sendVerificationEmail,
+  verifyUser,
 } = require('../controllers/user.controller')
 const {
   protect,
@@ -27,10 +29,12 @@ router.patch('/updateUser', protect, updateUser)
 
 router.get('/getUsers', protect, authorOnly, getUsers)
 router.get('/loginStatus', loginStatus)
+router.post('/sendAutomatedEmail', protect, sendAutomatedEmail)
+router.post('/sendVerificationEmail', protect, sendVerificationEmail)
+router.patch('/verifyUser/:verificationToken', protect, verifyUser)
 
 /*Admin Only Access Route */
 router.delete('/:id', protect, adminOnly, deleteUser)
 router.post('/upgradeUser', protect, adminOnly, upgradeUser)
-router.post('/sendAutomatedEmail', protect, sendAutomatedEmail)
 
 module.exports = router

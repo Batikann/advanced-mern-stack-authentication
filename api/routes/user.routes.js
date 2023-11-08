@@ -9,6 +9,7 @@ const {
   getUsers,
   loginStatus,
   upgradeUser,
+  sendAutomatedEmail,
 } = require('../controllers/user.controller')
 const {
   protect,
@@ -30,5 +31,6 @@ router.get('/loginStatus', loginStatus)
 /*Admin Only Access Route */
 router.delete('/:id', protect, adminOnly, deleteUser)
 router.post('/upgradeUser', protect, adminOnly, upgradeUser)
+router.post('/sendAutomatedEmail', protect, sendAutomatedEmail)
 
 module.exports = router

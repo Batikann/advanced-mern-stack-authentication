@@ -10,6 +10,8 @@ const parser = require('ua-parser-js')
 const sendEmail = require('../utils/sendEmail')
 const Token = require('../models/token.model')
 const crypto = require('crypto')
+const Cryptr = require('cryptr')
+const cryptr = new Cryptr(process.env.CRYPTR_KEY)
 
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body
@@ -68,6 +70,47 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error('Invalid user data.')
   }
 })
+
+//send login code
+const sendLoginCode = asyncHandler(async (req, res) => {
+  const { email } = req.params
+  const user = await User.findOne({ email })
+
+  if (!user) {
+    res.status(404)
+    throw new Error('User Not Found')
+  }
+
+  //Find Login Code in DB
+  const token = await Token.findOne({
+    userId: user._id,
+    expiresAt: { $gt: Date.now() },
+  })
+  if (!token) {
+    res.status(404)
+    throw new Error('Invalid or expired token, please login again!')
+  }
+  const loginCode = cryptr.decrypt(token.lToken)
+
+  //send login code
+  const subject = 'Login Code your Account - AUTHZ'
+  const send_to = email
+  const sent_from = process.env.EMAIL_USER
+  const reply_to = 'noreply@batik.com'
+  const template = 'loginCode'
+  const name = user.name
+  const link = loginCode
+
+  try {
+    await sendEmail(subject, send_to, sent_from, reply_to, template, name, link)
+    res.status(200).json({ message: `Access code  sent to ${email}` })
+  } catch (error) {
+    res.status(500)
+    throw new Error('Email not sent, please try again!.')
+  }
+})
+
+const loginWithCode = asyncHandler(async (req, res) => {})
 
 const sendVerificationEmail = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id)
@@ -172,6 +215,33 @@ const loginUser = asyncHandler(async (req, res) => {
 
   //Trigger 2FA for unkown userAgent
 
+  const ua = parser(req.headers['user-agent'])
+  const thisUserAgent = ua.ua
+  console.log(thisUserAgent)
+  const allowedDevice = user.userAgent.includes(thisUserAgent)
+
+  if (!allowedDevice) {
+    const loginCode = Math.floor(100000 + Math.random() * 900000)
+    console.log(loginCode)
+    // Hash token before saving to DB
+    const encryptedLoginCode = cryptr.encrypt(loginCode.toString())
+
+    // Delete token if it exists in DB
+    let userToken = await Token.findOne({ userId: user._id })
+    if (userToken) {
+      await userToken.deleteOne()
+    }
+
+    await new Token({
+      userId: user._id,
+      lToken: encryptedLoginCode,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 60 * (60 * 1000) /* 1 hours */,
+    }).save()
+
+    res.status(400)
+    throw new Error('Check you email for login code')
+  }
   //Generate Token
   const token = generateToken(user._id)
   if (user && passwordIsCorret) {
@@ -339,6 +409,104 @@ const sendAutomatedEmail = asyncHandler(async (req, res) => {
   }
 })
 
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body
+  const user = await User.findOne({ email })
+  if (!user) {
+    res.status(404)
+    throw new Error('No user with this email')
+  }
+
+  let token = Token.findOne({ userId: user._id })
+  if (token) {
+    await token.deleteOne()
+  }
+
+  const resetToken = crypto.randomBytes(32).toString('hex') + user._id
+  console.log(resetToken)
+
+  const hashedToken = hashToken(resetToken)
+
+  await new Token({
+    userId: user._id,
+    rToken: hashedToken,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + 60 * (60 * 1000) /*1 hour */,
+  }).save()
+
+  const resetURL = `${process.env.FRONTEND_URL}/resetPassword/${resetToken}`
+
+  //send Email
+  const subject = 'Password Reset Request - AUTHZ'
+  const send_to = user.email
+  const sent_from = process.env.EMAIL_USER
+  const reply_to = 'noreply@batik.com'
+  const template = 'forgotPassword'
+  const name = user.name
+  const link = resetURL
+
+  try {
+    await sendEmail(subject, send_to, sent_from, reply_to, template, name, link)
+    res.status(200).json({ message: 'password reset email sent' })
+  } catch (error) {
+    res.status(500)
+    throw new Error('Email not sent, please try again!.')
+  }
+})
+
+const resetToken = asyncHandler(async (req, res) => {
+  const { resetToken } = req.params
+  const { password } = req.body
+
+  const hashedToken = hashToken(resetToken)
+
+  const userToken = await Token.findOne({
+    rToken: hashedToken,
+    expiresAt: { $gt: Date.now() },
+  })
+
+  if (!userToken) {
+    res.status(404)
+    throw new Error('Invalid or Expired Token')
+  }
+
+  //Find User
+  const user = await User.findById({ _id: userToken.userId })
+
+  user.password = password
+  await user.save()
+  res.status(200).json({
+    message: `Password resset successfully please try login new password`,
+  })
+})
+
+const changePassword = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id)
+  const { oldPassword, newPassword } = req.body
+  if (!user) {
+    res.status(404)
+    throw new Error('User not found ')
+  }
+
+  if (!oldPassword || !newPassword) {
+    res.status(400)
+    throw new Error('Please enter old and new password')
+  }
+
+  const passwordIsCorret = correctUserPassword(oldPassword, user.password)
+
+  if (user && passwordIsCorret) {
+    user.password = newPassword
+    await user.save()
+    res
+      .status(200)
+      .json({ message: 'Password changed Successfully , please re-login' })
+  } else {
+    res.status(400)
+    throw new Error('Current Password not valid')
+  }
+})
+
 module.exports = {
   registerUser,
   loginUser,
@@ -352,4 +520,8 @@ module.exports = {
   sendAutomatedEmail,
   sendVerificationEmail,
   verifyUser,
+  forgotPassword,
+  resetToken,
+  changePassword,
+  sendLoginCode,
 }

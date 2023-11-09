@@ -12,6 +12,11 @@ const {
   sendAutomatedEmail,
   sendVerificationEmail,
   verifyUser,
+  forgotPassword,
+  resetToken,
+  changePassword,
+  sendLoginCode,
+  loginWithCode,
 } = require('../controllers/user.controller')
 const {
   protect,
@@ -22,6 +27,8 @@ const {
 const router = express.Router()
 
 router.post('/register', registerUser)
+router.patch('/verifyUser/:verificationToken', verifyUser)
+
 router.post('/login', loginUser)
 router.get('/logout', logoutUser)
 router.get('/getUser', protect, getUser)
@@ -29,9 +36,15 @@ router.patch('/updateUser', protect, updateUser)
 
 router.get('/getUsers', protect, authorOnly, getUsers)
 router.get('/loginStatus', loginStatus)
+
 router.post('/sendAutomatedEmail', protect, sendAutomatedEmail)
 router.post('/sendVerificationEmail', protect, sendVerificationEmail)
-router.patch('/verifyUser/:verificationToken', protect, verifyUser)
+
+router.post('/forgotPassword', forgotPassword)
+router.patch('/resetPassword/:resetToken', resetToken)
+router.patch('/changePassword', protect, changePassword)
+router.post('/sendLoginCode/:email', sendLoginCode)
+router.post('/loginWithCode/:email', loginWithCode)
 
 /*Admin Only Access Route */
 router.delete('/:id', protect, adminOnly, deleteUser)

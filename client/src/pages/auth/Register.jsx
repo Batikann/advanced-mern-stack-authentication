@@ -5,6 +5,16 @@ import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import PasswordInput from '../../components/passwordInput/PasswordInput'
 import Card from '../../components/card/Card'
+import { toast } from 'react-toastify'
+import { useDispatch, useSelector } from 'react-redux'
+import { validateEmail } from '../../utils/validateRules'
+import {
+  RESET,
+  register,
+  // sendVerificationEmail,
+} from '../../redux/features/auth/authSlice'
+
+import { useNavigate } from 'react-router-dom'
 
 const initialState = {
   name: '',
@@ -14,6 +24,8 @@ const initialState = {
 }
 
 const Register = () => {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [formData, setFormData] = useState(initialState)
   const { name, email, password, confirmPassword } = formData
   const [uCase, setUCase] = useState(false)
@@ -30,6 +42,10 @@ const Register = () => {
     }
     return timesIcon
   }
+
+  const { isLoading, isLoggedIn, isError, isSuccess, message } = useSelector(
+    (state) => state.auth
+  )
 
   useEffect(() => {
     // Check Lower and Uppercase
@@ -62,21 +78,40 @@ const Register = () => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
   }
-  //   const registerUser = async (e) => {
-  //     e.preventDefault()
 
-  //     if (!name || !email || !password) {
-  //       return toast.error('All fields are required')
-  //     }
-  //     if (password.length < 6) {
-  //       return toast.error('Passwords must be up to 6 characters')
-  //     }
-  //     if (!validateEmail(email)) {
-  //       return toast.error('Please enter a valid email')
-  //     }
-  //     if (password !== password2) {
-  //       return toast.error('Passwords do not match')
-  //     }
+  const registerUser = async (e) => {
+    e.preventDefault()
+
+    if (!name || !email || !password) {
+      return toast.error('All fields are required')
+    }
+    if (password.length < 6) {
+      return toast.error('Passwords must be up to 6 characters')
+    }
+    if (!validateEmail(email)) {
+      return toast.error('Please enter a valid email')
+    }
+    if (password !== confirmPassword) {
+      return toast.error('Passwords do not match')
+    }
+
+    const userData = {
+      name,
+      email,
+      password,
+    }
+    console.log(userData)
+
+    await dispatch(register(userData))
+    // await dispatch(sendVerificationEmail())
+  }
+
+  useEffect(() => {
+    if (isSuccess && isLoggedIn) {
+      navigate('/profile')
+    }
+    dispatch(RESET())
+  }, [isLoggedIn, isSuccess, dispatch, navigate, message])
 
   return (
     <Card>
@@ -85,7 +120,7 @@ const Register = () => {
         <p className="text-3xl font-bold mb-2">Register</p>
       </div>
       <div>
-        <form className="flex flex-col gap-3 mb-2">
+        <form className="flex flex-col gap-3 mb-2" onSubmit={registerUser}>
           <input
             className="h-10 px-4 text-black outline-none border border-slate-900"
             type="text"
@@ -108,6 +143,11 @@ const Register = () => {
             value={confirmPassword}
             name="confirmPassword"
             placeholder="Confirm Password"
+            onPaste={(e) => {
+              e.preventDefault()
+              toast.error('Cannot paste  into input field')
+              return false
+            }}
           />
 
           <div>

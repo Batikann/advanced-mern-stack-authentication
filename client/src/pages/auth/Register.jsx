@@ -15,6 +15,7 @@ import {
 } from '../../redux/features/auth/authSlice'
 
 import { useNavigate } from 'react-router-dom'
+import Loader from '../../components/loader/Loader'
 
 const initialState = {
   name: '',
@@ -114,87 +115,90 @@ const Register = () => {
   }, [isLoggedIn, isSuccess, dispatch, navigate, message])
 
   return (
-    <Card>
-      <div className="flex flex-col gap-3 items-center">
-        <FiUserPlus size={35} />
-        <p className="text-3xl font-bold mb-2">Register</p>
-      </div>
-      <div>
-        <form className="flex flex-col gap-3 mb-2" onSubmit={registerUser}>
-          <input
-            className="h-10 px-4 text-black outline-none border border-slate-900"
-            type="text"
-            placeholder="Name"
-            name="name"
-            value={name}
-            onChange={handleInputChange}
-          />
-          <input
-            className="h-10 px-4 text-black outline-none border border-slate-900"
-            type="text"
-            placeholder="email"
-            name="email"
-            value={email}
-            onChange={handleInputChange}
-          />
-          <PasswordInput onChange={handleInputChange} value={password} />
-          <PasswordInput
-            onChange={handleInputChange}
-            value={confirmPassword}
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            onPaste={(e) => {
-              e.preventDefault()
-              toast.error('Cannot paste  into input field')
-              return false
-            }}
-          />
+    <>
+      {isLoading && <Loader />}
+      <Card>
+        <div className="flex flex-col gap-3 items-center">
+          <FiUserPlus size={35} />
+          <p className="text-3xl font-bold mb-2">Register</p>
+        </div>
+        <div>
+          <form className="flex flex-col gap-3 mb-2" onSubmit={registerUser}>
+            <input
+              className="h-10 px-4 text-black outline-none border border-slate-900"
+              type="text"
+              placeholder="Name"
+              name="name"
+              value={name}
+              onChange={handleInputChange}
+            />
+            <input
+              className="h-10 px-4 text-black outline-none border border-slate-900"
+              type="text"
+              placeholder="email"
+              name="email"
+              value={email}
+              onChange={handleInputChange}
+            />
+            <PasswordInput onChange={handleInputChange} value={password} />
+            <PasswordInput
+              onChange={handleInputChange}
+              value={confirmPassword}
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              onPaste={(e) => {
+                e.preventDefault()
+                toast.error('Cannot paste  into input field')
+                return false
+              }}
+            />
 
-          <div>
-            {/* List  */}
-            <ul className="flex flex-col gap-2">
-              <li>
-                <span className="flex items-center">
-                  {/* {uCase ? checkIcon : timesIcon} */}
-                  {switchIcon(uCase)}
-                  &nbsp; Lowercase & Uppercase
-                </span>
-              </li>
-              <li>
-                <span className="flex items-center">
-                  {switchIcon(num)}
-                  &nbsp; Number (0-9)
-                </span>
-              </li>
-              <li>
-                <span className="flex items-center">
-                  {switchIcon(sChar)}
-                  &nbsp; Special Character (!@#$%^&*)
-                </span>
-              </li>
-              <li>
-                <span className="flex items-center">
-                  {switchIcon(passLength)}
-                  &nbsp; At least 6 Character
-                </span>
-              </li>
-            </ul>
-          </div>
-          <button
-            type="submit"
-            className="bg-white h-10 text-black py-1 font-semibold hover:bg-indigo-600 border border-slate-900"
-          >
-            Register
-          </button>
-        </form>
-      </div>
-      <p>
-        Already have an account ?
-        <Link to="/login" className="ml-2 font-bold">
-          Login
-        </Link>
-      </p>
-    </Card>
+            <div>
+              {/* List  */}
+              <ul className="flex flex-col gap-2">
+                <li>
+                  <span className="flex items-center">
+                    {/* {uCase ? checkIcon : timesIcon} */}
+                    {switchIcon(uCase)}
+                    &nbsp; Lowercase & Uppercase
+                  </span>
+                </li>
+                <li>
+                  <span className="flex items-center">
+                    {switchIcon(num)}
+                    &nbsp; Number (0-9)
+                  </span>
+                </li>
+                <li>
+                  <span className="flex items-center">
+                    {switchIcon(sChar)}
+                    &nbsp; Special Character (!@#$%^&*)
+                  </span>
+                </li>
+                <li>
+                  <span className="flex items-center">
+                    {switchIcon(passLength)}
+                    &nbsp; At least 6 Character
+                  </span>
+                </li>
+              </ul>
+            </div>
+            <button
+              type="submit"
+              className="bg-white h-10 text-black py-1 font-semibold hover:bg-indigo-600 border border-slate-900"
+            >
+              Register
+            </button>
+          </form>
+        </div>
+        <p>
+          Already have an account ?
+          <Link to="/login" className="ml-2 font-bold">
+            Login
+          </Link>
+        </p>
+      </Card>
+    </>
   )
 }
 

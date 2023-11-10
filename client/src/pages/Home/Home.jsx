@@ -5,7 +5,7 @@ const Home = () => {
   return (
     <div className="mt-2">
       <div className="max-w-7xl mx-auto ">
-        <div className="flex  justify-center">
+        <div className="flex items-center justify-center">
           <div className="flex  flex-col gap-y-4 flex-1">
             <h1 className="text-4xl font-bold text-slate-800">
               Ultimate MERN Stack Authentication System
@@ -33,7 +33,7 @@ const Home = () => {
               </Link>
             </div>
           </div>
-          <div className="flex  w-[40%]">
+          <div className="flex items-center justify-center mt-11  w-[40%]">
             <img src={loginImg} alt="auth" />
           </div>
         </div>

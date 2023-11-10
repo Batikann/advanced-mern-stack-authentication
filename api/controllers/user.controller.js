@@ -579,4 +579,5 @@ module.exports = {
   resetToken,
   changePassword,
   sendLoginCode,
+  loginWithCode,
 }

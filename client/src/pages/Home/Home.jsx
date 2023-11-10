@@ -4,7 +4,7 @@ import loginImg from '../../assets/login.svg'
 const Home = () => {
   return (
     <div className="mt-2">
-      <div className="max-w-7xl mx-auto ">
+      <div className="max-w-7xl mx-auto  flex items-center justify-center ">
         <div className="flex items-center justify-center">
           <div className="flex  flex-col gap-y-4 flex-1">
             <h1 className="text-4xl font-bold text-slate-800">

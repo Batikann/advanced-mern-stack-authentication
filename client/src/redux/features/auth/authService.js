@@ -27,11 +27,25 @@ const getLoginStatus = async () => {
   return res.data
 }
 
+//Get User
+const getUser = async () => {
+  const res = await axios.get(API_URL + 'getUser')
+  return res.data
+}
+
+//update USER
+const updateUser = async (userData) => {
+  const res = await axios.patch(API_URL + 'updateUser', updateUser)
+  return res.data
+}
+
 const authService = {
   register,
   login,
   logout,
   getLoginStatus,
+  getUser,
+  updateUser,
 }
 
 export default authService

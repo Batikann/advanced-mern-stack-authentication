@@ -80,6 +80,37 @@ export const getLoginStatus = createAsyncThunk(
   }
 )
 
+//Login Status User
+export const getUser = createAsyncThunk('auth/getUser', async (_, thunkAPI) => {
+  try {
+    return await authService.getUser()
+  } catch (error) {
+    const message =
+      (error.response && error.response.data && error.response.data.message) ||
+      error.message ||
+      error.toString()
+    return thunkAPI.rejectWithValue(message)
+  }
+})
+
+//update USER
+export const updateUser = createAsyncThunk(
+  'auth/updateUser',
+  async (userData, thunkAPI) => {
+    try {
+      return await authService.updateUser(userData)
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString()
+      return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -164,11 +195,42 @@ const authSlice = createSlice({
         state.isError = true
         state.message = action.payload
       })
+      // Get USER
+      .addCase(getUser.pending, (state, action) => {
+        state.isLoading = true
+      })
+      .addCase(getUser.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.user = action.payload
+      })
+      .addCase(getUser.rejected, (state, action) => {
+        state.isLoading = false
+        state.isError = true
+        state.message = action.payload
+        toast.error(action.payload)
+      })
+      // update USER
+      .addCase(updateUser.pending, (state, action) => {
+        state.isLoading = true
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.user = action.payload
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.isLoading = false
+        state.isError = true
+        state.message = action.payload
+        toast.error(action.payload)
+      })
   },
 })
 
 export const { RESET } = authSlice.actions
 
 export const selectIsLoggedIn = (state) => state.auth.isLoggedIn
+export const selectUser = (state) => state.auth.user
 
 export default authSlice.reducer

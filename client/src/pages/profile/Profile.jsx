@@ -1,60 +1,77 @@
-import { useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import PageMenu from '../../components/pageMenu/PageMenu'
 import userRedirectLoggedOutUser from '../../customHook/userRedirectLoggedOutUser'
-
-const initialState = {
-  name: 'Emir Batikan UÇAR',
-  email: 'emiruar123@gmail.com',
-  phone: '',
-  bio: '',
-  photo: '',
-  role: '',
-  isVerified: false,
-}
+import { useDispatch, useSelector } from 'react-redux'
+import { getUser } from '../../redux/features/auth/authSlice'
+import Loader from '../../components/loader/Loader'
 
 const Profile = () => {
+  const dispatch = useDispatch()
   userRedirectLoggedOutUser('/')
-  const handleImageChange = () => {}
-  const handleInputChange = () => {}
+
+  const { isLoading, isLoggedIn, isSuccess, message, user } = useSelector(
+    (state) => state.auth
+  )
+  const initialState = {
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    bio: user?.bio || '',
+    role: user?.role || '',
+    isVerified: user?.isVerified || false,
+  }
   const [profile, setProfile] = useState(initialState)
+
+  useEffect(() => {
+    dispatch(getUser())
+  }, [dispatch])
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setProfile({ ...profile, [name]: value })
+  }
+
+  const saveProfile = async (e) => {
+    e.preventDefault()
+  }
+
+  useLayoutEffect(() => {
+    if (user) {
+      setProfile({
+        ...profile,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        bio: user.bio,
+        role: user.role,
+        isVerified: user.isVerified,
+      })
+    }
+  }, [user])
 
   return (
     <section className="flex justify-center flex-col  items-center">
+      {isLoading && <Loader />}
       <PageMenu />
       <div>
         <h2 className="text-3xl font-bold tracking-wider text-center my-5">
           Profile
         </h2>
         <div className=" flex flex-col gap-5">
-          <img
-            src="https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1299"
-            alt="avatar"
-            className="w-28 h-28 rounded-full"
-          />
           <h3>
-            Role:<span className="font-bold text-lg ml-2">Admin</span>
+            Role:<span className="font-bold text-lg ml-2">{profile?.role}</span>
           </h3>
         </div>
       </div>
       <div>
-        <form className="flex flex-col gap-2">
-          <p className="flex flex-col gap-y-2">
-            <label className="font-semibold">Change Photo:</label>
-            <input
-              className="border border-slate-800 p-2"
-              type="file"
-              accept="image/*"
-              name="image"
-              onChange={handleImageChange}
-            />
-          </p>
+        <form className="flex flex-col gap-2" onSubmit={saveProfile}>
           <p className="flex flex-col gap-y-2">
             <label className="font-semibold">Name:</label>
             <input
               type="text"
               name="name"
               placeholder="Name"
-              value={profile.name}
+              value={profile?.name}
               onChange={handleInputChange}
               className="border border-slate-800 p-2 outline-none"
             />
@@ -65,7 +82,7 @@ const Profile = () => {
               type="email"
               placeholder="Email"
               name="email"
-              value={profile.email}
+              value={profile?.email}
               onChange={handleInputChange}
               disabled
               className="border border-slate-800 p-2 outline-none"
@@ -77,7 +94,7 @@ const Profile = () => {
               type="text"
               name="phone"
               placeholder="+90 5422222222"
-              value={profile.phone}
+              value={profile?.phone}
               onChange={handleInputChange}
               className="border border-slate-800 p-2 outline-none"
             />
@@ -89,7 +106,7 @@ const Profile = () => {
               name="bio"
               cols={30}
               rows={5}
-              value={profile.bio}
+              value={profile?.bio}
               onChange={handleInputChange}
               className="border border-slate-800 px-2  outline-none"
             />

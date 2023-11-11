@@ -61,10 +61,10 @@ const registerUser = asyncHandler(async (req, res) => {
   })
 
   if (user) {
-    const { _id, name, email, phone, bio, photo, role, isVerified } = user
+    const { _id, name, email, phone, bio, role, isVerified } = user
     res
       .status(201)
-      .json({ _id, name, email, phone, bio, photo, role, isVerified, token })
+      .json({ _id, name, email, phone, bio, role, isVerified, token })
   } else {
     res.status(400)
     throw new Error('Invalid user data.')
@@ -152,12 +152,12 @@ const loginWithCode = asyncHandler(async (req, res) => {
       sameSite: 'none',
       secure: true,
     })
-    const { _id, name, email, photo, phone, bio, isVerified, role } = user
+    const { _id, name, email, phone, bio, isVerified, role } = user
     res.status(200).json({
       _id,
       name,
       email,
-      photo,
+
       phone,
       bio,
       isVerified,
@@ -309,14 +309,14 @@ const loginUser = asyncHandler(async (req, res) => {
       secure: true,
     })
 
-    const { _id, name, email, phone, bio, photo, role, isVerified } = user
+    const { _id, name, email, phone, bio, role, isVerified } = user
     res.status(201).json({
       _id,
       name,
       email,
       phone,
       bio,
-      photo,
+
       role,
       isVerified,
       token,
@@ -342,14 +342,13 @@ const getUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id)
 
   if (user) {
-    const { _id, name, email, phone, bio, photo, role, isVerified } = user
+    const { _id, name, email, phone, bio, role, isVerified } = user
     res.status(200).json({
       _id,
       name,
       email,
       phone,
       bio,
-      photo,
       role,
       isVerified,
     })
@@ -363,13 +362,12 @@ const updateUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id)
 
   if (user) {
-    const { name, phone, bio, photo, email } = user
+    const { name, phone, bio, email } = user
 
     user.email = email
     user.name = req.body.name || name
     user.phone = req.body.phone || phone
     user.bio = req.body.bio || bio
-    user.photo = req.body.photo || photo
 
     const updatedUser = await user.save()
     res.status(200).json({
@@ -378,7 +376,7 @@ const updateUser = asyncHandler(async (req, res) => {
       email: updatedUser.email,
       phone: updatedUser.phone,
       bio: updatedUser.bio,
-      photo: updatedUser.photo,
+
       role: updatedUser.role,
       isVerified: updatedUser.isVerified,
     })

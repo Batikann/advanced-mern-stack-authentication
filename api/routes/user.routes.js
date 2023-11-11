@@ -35,7 +35,7 @@ router.get('/getUser', protect, getUser)
 router.patch('/updateUser', protect, updateUser)
 
 router.get('/getUsers', protect, authorOnly, getUsers)
-router.get('/getLoginStatus', loginStatus)
+router.get('/loginStatus', loginStatus)
 
 router.post('/sendAutomatedEmail', protect, sendAutomatedEmail)
 router.post('/sendVerificationEmail', protect, sendVerificationEmail)

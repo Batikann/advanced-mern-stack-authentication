@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import PageMenu from '../../components/pageMenu/PageMenu'
+import userRedirectLoggedOutUser from '../../customHook/userRedirectLoggedOutUser'
 
 const initialState = {
   name: 'Emir Batikan UÇAR',
@@ -12,6 +13,7 @@ const initialState = {
 }
 
 const Profile = () => {
+  userRedirectLoggedOutUser('/')
   const handleImageChange = () => {}
   const handleInputChange = () => {}
   const [profile, setProfile] = useState(initialState)

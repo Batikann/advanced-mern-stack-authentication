@@ -270,33 +270,33 @@ const loginUser = asyncHandler(async (req, res) => {
 
   //Trigger 2FA for unkown userAgent
 
-  const ua = parser(req.headers['user-agent'])
-  const thisUserAgent = ua.ua
-  console.log(thisUserAgent)
-  const allowedDevice = user.userAgent.includes(thisUserAgent)
+  // const ua = parser(req.headers['user-agent'])
+  // const thisUserAgent = ua.ua
+  // console.log(thisUserAgent)
+  // const allowedDevice = user.userAgent.includes(thisUserAgent)
 
-  if (!allowedDevice) {
-    const loginCode = Math.floor(100000 + Math.random() * 900000)
-    console.log(loginCode)
-    // Hash token before saving to DB
-    const encryptedLoginCode = cryptr.encrypt(loginCode.toString())
+  // if (!allowedDevice) {
+  //   const loginCode = Math.floor(100000 + Math.random() * 900000)
+  //   console.log(loginCode)
+  //   // Hash token before saving to DB
+  //   const encryptedLoginCode = cryptr.encrypt(loginCode.toString())
 
-    // Delete token if it exists in DB
-    let userToken = await Token.findOne({ userId: user._id })
-    if (userToken) {
-      await userToken.deleteOne()
-    }
+  //   // Delete token if it exists in DB
+  //   let userToken = await Token.findOne({ userId: user._id })
+  //   if (userToken) {
+  //     await userToken.deleteOne()
+  //   }
 
-    await new Token({
-      userId: user._id,
-      lToken: encryptedLoginCode,
-      createdAt: Date.now(),
-      expiresAt: Date.now() + 60 * (60 * 1000) /* 1 hours */,
-    }).save()
+  //   await new Token({
+  //     userId: user._id,
+  //     lToken: encryptedLoginCode,
+  //     createdAt: Date.now(),
+  //     expiresAt: Date.now() + 60 * (60 * 1000) /* 1 hours */,
+  //   }).save()
 
-    res.status(400)
-    throw new Error('new browser or device detected')
-  }
+  //   res.status(400)
+  //   throw new Error('new browser or device detected')
+  // }
   //Generate Token
   const token = generateToken(user._id)
   if (user && passwordIsCorret) {

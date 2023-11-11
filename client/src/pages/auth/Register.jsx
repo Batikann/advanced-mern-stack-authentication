@@ -109,7 +109,7 @@ const Register = () => {
 
   useEffect(() => {
     if (isSuccess && isLoggedIn) {
-      navigate('/profile')
+      navigate('/login')
     }
     dispatch(RESET())
   }, [isLoggedIn, isSuccess, dispatch, navigate, message])

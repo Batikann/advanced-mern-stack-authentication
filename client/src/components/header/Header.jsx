@@ -1,9 +1,19 @@
 import { BiUserCircle } from 'react-icons/bi'
 import { SiAuthelia } from 'react-icons/si'
-import { Link, NavLink } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { RESET, logout } from '../../redux/features/auth/authSlice'
 
 const activeLink = ({ isActive }) => (isActive ? 'border-b border-b-white' : '')
 const Header = () => {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const logoutUser = async () => {
+    dispatch(RESET())
+    await dispatch(logout())
+    navigate('/')
+  }
+
   return (
     <header className="bg-indigo-800 p-5">
       <nav className="flex items-center justify-between max-w-7xl mx-auto">
@@ -32,7 +42,7 @@ const Header = () => {
             </NavLink>
           </li>
           <li>
-            <button>Logout</button>
+            <button onClick={logoutUser}>Logout</button>
           </li>
         </ul>
       </nav>

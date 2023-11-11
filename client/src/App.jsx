@@ -14,10 +14,17 @@ import ChangePassword from './pages/changePassword/ChangePassword'
 import UserList from './pages/userList/UserList'
 import Loader from './components/loader/Loader'
 import axios from 'axios'
+import { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+import { getLoginStatus } from './redux/features/auth/authSlice'
 
 axios.defaults.withCredentials = true
 
 function App() {
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(getLoginStatus())
+  }, [dispatch])
   return (
     <BrowserRouter>
       <ToastContainer />

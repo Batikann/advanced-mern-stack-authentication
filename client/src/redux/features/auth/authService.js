@@ -35,8 +35,19 @@ const getUser = async () => {
 
 //update USER
 const updateUser = async (userData) => {
-  const res = await axios.patch(API_URL + 'updateUser', updateUser)
+  const res = await axios.patch(API_URL + 'updateUser', userData)
   return res.data
+}
+
+//send verification Email
+const sendVerificationEmail = async () => {
+  const response = await axios.post(API_URL + 'sendVerificationEmail')
+  return response.data.message
+}
+
+const verifyUser = async (verificationToken) => {
+  const res = await axios.patch(`${API_URL}verifyUser/${verificationToken}`)
+  return res.data.message
 }
 
 const authService = {
@@ -46,6 +57,8 @@ const authService = {
   getLoginStatus,
   getUser,
   updateUser,
+  sendVerificationEmail,
+  verifyUser,
 }
 
 export default authService

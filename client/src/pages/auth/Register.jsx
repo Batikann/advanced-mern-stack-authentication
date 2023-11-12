@@ -11,6 +11,7 @@ import { validateEmail } from '../../utils/validateRules'
 import {
   RESET,
   register,
+  sendVerificationEmail,
   // sendVerificationEmail,
 } from '../../redux/features/auth/authSlice'
 
@@ -104,7 +105,7 @@ const Register = () => {
     console.log(userData)
 
     await dispatch(register(userData))
-    // await dispatch(sendVerificationEmail())
+    await dispatch(sendVerificationEmail())
   }
 
   useEffect(() => {

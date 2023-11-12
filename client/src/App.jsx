@@ -17,6 +17,7 @@ import axios from 'axios'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { getLoginStatus } from './redux/features/auth/authSlice'
+import ProtectRoute from './components/protect/protectRoute'
 
 axios.defaults.withCredentials = true
 

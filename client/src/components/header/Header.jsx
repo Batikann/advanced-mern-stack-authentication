@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { RESET, logout } from '../../redux/features/auth/authSlice'
 import { ShowOnLogin, ShowOnLogout } from '../protect/hiddenLink'
+import { shortenText } from '../../utils/validateRules'
 
 const activeLink = ({ isActive }) => (isActive ? 'border-b border-b-white' : '')
 const Header = () => {
@@ -31,7 +32,11 @@ const Header = () => {
           <ShowOnLogin>
             <li className="flex items-center gap-2 cursor-pointer">
               <BiUserCircle size={22} />
-              <p className="font-semibold text-base">Hi! Batikann</p>
+              {/* {!isLoading && username && (
+                <p className="font-semibold text-base">
+                  Hi {shortenText(username, 9)}
+                </p>
+              )} */}
             </li>
             <li>
               <NavLink to="/profile" className={activeLink}>

@@ -20,10 +20,10 @@ export const ShowOnLogout = ({ children }) => {
   return null
 }
 
-export const adminAuthorLink = ({ children }) => {
+export const AdminAuthorLink = ({ children }) => {
   const isLoggedIn = useSelector(selectIsLoggedIn)
-  const userRole = useSelector(selectUser)
-  if (isLoggedIn && (userRole === 'admin' || userRole === 'author')) {
+  const user = useSelector(selectUser)
+  if (isLoggedIn && (user.role === 'admin' || user.role === 'author')) {
     return <>{children}</>
   }
   return null

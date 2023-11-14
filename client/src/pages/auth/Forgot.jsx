@@ -1,12 +1,34 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Card from '../../components/card/Card'
 import { AiOutlineMail } from 'react-icons/ai'
 import { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { RESET, forgotPassword } from '../../redux/features/auth/authSlice'
+import { toast } from 'react-toastify'
+import { validateEmail } from '../../utils/validateRules.js'
 
 const Forgot = () => {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
 
-  const handleInputChange = () => {}
+  const forgotPasswordHandle = async (e) => {
+    e.preventDefault()
+    if (!email) {
+      return toast.error('Please enter an email')
+    }
+    if (!validateEmail(email)) {
+      return toast.error('Please enter a valid email')
+    }
+
+    const userData = {
+      email,
+    }
+
+    await dispatch(forgotPassword(userData))
+    await dispatch(RESET())
+    navigate('/')
+  }
   return (
     <Card>
       <div className="flex flex-col gap-3 ">
@@ -15,14 +37,17 @@ const Forgot = () => {
           <h1 className="text-2xl font-bold">Forgot Password</h1>
         </div>
         <div>
-          <form className="flex flex-col gap-3 mb-3">
+          <form
+            onSubmit={forgotPasswordHandle}
+            className="flex flex-col gap-3 mb-3"
+          >
             <input
               type="text"
               name="email"
               placeholder="Email"
               className="border border-slate-700 text-black h-10 px-4 outline-none"
               value={email}
-              onChange={handleInputChange}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <button
               type="submit"

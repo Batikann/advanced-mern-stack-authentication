@@ -1,29 +1,75 @@
 import { useState } from 'react'
 import PageMenu from '../../components/pageMenu/PageMenu'
 import PasswordInput from '../../components/passwordInput/PasswordInput'
-
-const initialState = {
-  oldPassword: '',
-  newPassword: '',
-  confirmNewPassword: '',
-}
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import userRedirectLoggedOutUser from '../../customHook/userRedirectLoggedOutUser'
+import {
+  RESET,
+  changePassword,
+  logout,
+} from '../../redux/features/auth/authSlice'
+import { sendAutomatedEmail } from '../../redux/features/email/emailSlice'
 
 const ChangePassword = () => {
+  const initialState = {
+    oldPassword: '',
+    newPassword: '',
+    confirmNewPassword: '',
+  }
+  userRedirectLoggedOutUser('/')
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const { isLoading, user } = useSelector((state) => state.auth)
   const [formData, setFormData] = useState(initialState)
-  const handleInputChange = () => {}
+  const { oldPassword, newPassword, confirmNewPassword } = formData
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData({ ...formData, [name]: value })
+  }
+
+  const updatePassword = async (e) => {
+    e.preventDefault()
+
+    if (!oldPassword || !newPassword || !confirmNewPassword) {
+      toast.error('All fields are required!')
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      return toast.error('Passwords do not matched!')
+    }
+
+    const userData = { oldPassword, newPassword }
+
+    const emailData = {
+      subject: 'Password Changed - AUTHZ',
+      send_to: user.email,
+      reply_to: 'noreply@batiko',
+      template: 'changePassword',
+      url: '/forgot',
+    }
+
+    await dispatch(changePassword(userData))
+    await dispatch(sendAutomatedEmail(emailData))
+    await dispatch(logout())
+    await dispatch(RESET())
+    navigate('/login')
+  }
   return (
     <section className="flex justify-center flex-col  items-center ">
       <PageMenu />
       <div className="border border-slate-800 p-4 mt-6">
         <h2 className="text-4xl font-bold my-4">Change Password</h2>
         <div>
-          <form className="flex flex-col gap-y-3">
+          <form onSubmit={updatePassword} className="flex flex-col gap-y-3">
             <p className="flex flex-col gap-y-2">
               <label className="font-bold text-base">Current Password:</label>
               <PasswordInput
                 placeholder="Current password"
-                name="currentpassword"
-                value={formData.oldPassword}
+                name="oldPassword"
+                value={oldPassword}
                 onChange={handleInputChange}
               />
             </p>
@@ -31,8 +77,8 @@ const ChangePassword = () => {
               <label className="font-bold text-base">New Password:</label>
               <PasswordInput
                 placeholder="New Password"
-                name="newpassword"
-                value={formData.newPassword}
+                name="newPassword"
+                value={newPassword}
                 onChange={handleInputChange}
               />
             </p>
@@ -42,8 +88,8 @@ const ChangePassword = () => {
               </label>
               <PasswordInput
                 placeholder="Confirm New Password"
-                name="confirmnewpassword"
-                value={formData.confirmNewPassword}
+                name="confirmNewPassword"
+                value={confirmNewPassword}
                 onChange={handleInputChange}
               />
             </p>

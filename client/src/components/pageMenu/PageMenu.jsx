@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { AdminAuthorLink } from '../protect/hiddenLink'
 
 const PageMenu = () => {
   const activeLink = ({ isActive }) =>
@@ -18,11 +19,13 @@ const PageMenu = () => {
             </NavLink>
           </li>
 
-          <li>
-            <NavLink to="/users" className={activeLink}>
-              Users
-            </NavLink>
-          </li>
+          <AdminAuthorLink>
+            <li>
+              <NavLink to="/users" className={activeLink}>
+                Users
+              </NavLink>
+            </li>
+          </AdminAuthorLink>
         </ul>
       </nav>
     </div>

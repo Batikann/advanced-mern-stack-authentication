@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
-const API_URL = `${BACKEND_URL}/api/users/`
+export const API_URL = `${BACKEND_URL}/api/users/`
 
 //REGISTER USER
 const register = async (userData) => {
@@ -45,8 +45,30 @@ const sendVerificationEmail = async () => {
   return response.data.message
 }
 
+//Verify User
 const verifyUser = async (verificationToken) => {
   const res = await axios.patch(`${API_URL}verifyUser/${verificationToken}`)
+  return res.data.message
+}
+
+//Change Passwword
+const changePassword = async (userData) => {
+  const res = await axios.patch(API_URL + 'changePassword', userData)
+  return res.data.message
+}
+
+//Forgot Password
+const forgotPassword = async (userData) => {
+  const res = await axios.post(API_URL + 'forgotPassword', userData)
+  return res.data.message
+}
+
+//Reset Password
+const resetPassword = async (userData, resetToken) => {
+  const res = await axios.patch(
+    `${API_URL}resetPassword/${resetToken}`,
+    userData
+  )
   return res.data.message
 }
 
@@ -59,6 +81,9 @@ const authService = {
   updateUser,
   sendVerificationEmail,
   verifyUser,
+  changePassword,
+  forgotPassword,
+  resetPassword,
 }
 
 export default authService

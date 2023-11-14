@@ -12,12 +12,12 @@ const Notification = () => {
   }
 
   return (
-    <div className="flex justify-center items-center text-center">
-      <div className="bg-red-400 p-4">
+    <div className="flex justify-center items-center text-center mt-6">
+      <div className="bg-red-400 p-3">
         <p className="text-xl">
           <b>Message: </b> &nbsp;
         </p>
-        <p className="text-2xl my-2">
+        <p className="text-xl my-2">
           To verify your account, check your email for a verification link.
           &nbsp;
         </p>

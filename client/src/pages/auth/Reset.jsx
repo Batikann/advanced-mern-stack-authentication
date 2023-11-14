@@ -1,8 +1,11 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import Card from '../../components/card/Card'
 import { MdPassword } from 'react-icons/md'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import PasswordInput from '../../components/passwordInput/PasswordInput'
+import { useDispatch, useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
+import { RESET, resetPassword } from '../../redux/features/auth/authSlice'
 
 const initialState = {
   password: '',
@@ -10,10 +13,51 @@ const initialState = {
 }
 
 const Reset = () => {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const { isLoading, isLoggedIn, isError, isSuccess, message } = useSelector(
+    (state) => state.auth
+  )
   const [formData, setFormData] = useState(initialState)
   const { password, confirmNewPassword } = formData
+  const { resetToken } = useParams()
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData({ ...formData, [name]: value })
+  }
 
-  const handleInputChange = () => {}
+  const reset = async (e) => {
+    e.preventDefault()
+
+    if (password.length < 6) {
+      return toast.error('Password must be up 6 characters')
+    }
+
+    if (password !== confirmNewPassword) {
+      return toast.error('Passwords do not match')
+    }
+
+    const userData = {
+      password,
+    }
+
+    await dispatch(resetPassword({ userData, resetToken }))
+    await dispatch(RESET())
+  }
+
+  useEffect(() => {
+    if (
+      isSuccess &&
+      message.includes(
+        'Password resset successfully please try login new password'
+      )
+    ) {
+      navigate('/login')
+    }
+
+    dispatch(RESET())
+  }, [isError, isSuccess, message, isLoggedIn, dispatch, navigate])
+
   return (
     <Card>
       <div className="flex flex-col gap-3 ">
@@ -22,7 +66,7 @@ const Reset = () => {
           <h1 className="text-3xl font-bold">Reset Password</h1>
         </div>
         <div>
-          <form className="flex flex-col gap-3 mb-3">
+          <form onSubmit={reset} className="flex flex-col gap-3 mb-3">
             <PasswordInput
               name="password"
               value={password}
@@ -30,7 +74,7 @@ const Reset = () => {
               placeholder="New Password"
             />
             <PasswordInput
-              name="confirmPassword"
+              name="confirmNewPassword"
               value={confirmNewPassword}
               onChange={handleInputChange}
               placeholder="Confirm New Password"
